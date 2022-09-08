@@ -1,3 +1,4 @@
+import random
 import time
 
 import pyautogui
@@ -9,9 +10,9 @@ while True:
     if box:
         x, y = box
         pyautogui.click(x, y + 240)
-        time.sleep(0.05)
+        time.sleep(random.random())
         pyautogui.click(1250, 825)
-        time.sleep(0.05)
+        time.sleep(random.random())
         pyautogui.click(2370, 1300)
-        time.sleep(0.05)
+        time.sleep(random.random())
 

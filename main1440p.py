@@ -4,7 +4,7 @@ import time
 import pyautogui
 
 
-IS_SHOPPING_MODE = False
+IS_SHOPPING_MODE = True
 SHOPPING_SKIPS = 1
 
 
@@ -12,12 +12,67 @@ pyautogui.mouseInfo()
 time.sleep(2)
 iteration = 0
 
-while True:
-    iteration += 1
-    if iteration == 20:
-        iteration = 0
+task_started = False
 
-        # Level up
+while True:
+    print(iteration)
+    iteration += 1
+    if iteration % 10 == 0:
+        if iteration == 1000:
+            iteration = 0
+            continue
+
+        # Check for available task
+        search_mark = pyautogui.locateCenterOnScreen('resources_3k/SearchMark.png', confidence=0.7,
+                                                     region=(75, 50, 175, 150))
+        if search_mark:
+            pyautogui.click(*search_mark)
+            pyautogui.click(*search_mark)
+
+        # Check for open shop
+        heights_icon = pyautogui.locateOnScreen('resources_3k/SpringfieldHeights.png', confidence=0.6, grayscale=True,
+                                                region=(1400, 230, 220, 100))
+        if heights_icon:
+            shop_locator_data = {
+                'confidence': 0.6,
+                'grayscale': True,
+                'region': (1550, 350, 100, 70)
+            }
+
+            # Contains the names of all image names
+            heights_facilities = ['HeightsFurniture', 'HeightsCoffee', 'HeightsElectronic',
+                                  'HeightsYoga', 'Pill', 'Trophy', 'HeightsAds']
+
+            for facility in heights_facilities:
+                facility_icon = pyautogui.locateOnScreen(f'resources_3k/{facility}.png', **shop_locator_data)
+
+                if facility_icon:
+                    def find_start_task_button():
+                        return pyautogui.locateCenterOnScreen('resources_3k/StartTask.png', confidence=0.85,
+                                                              region=(1500, 410, 400, 540))
+
+
+                    button = find_start_task_button()
+                    while button:
+                        pyautogui.click(*button)
+                        button = find_start_task_button()
+                    break
+
+            # Close shop
+            close_sign = pyautogui.locateCenterOnScreen('resources_3k/CloseModal.png', confidence=0.6,
+                                                        region=(850, 300, 70, 70))
+            if close_sign:
+                pyautogui.click(*close_sign)
+                continue
+
+    if iteration % 500 == 0:
+        # Crash check
+        game_icon = pyautogui.locateCenterOnScreen('resources_3k/TappedOutIcon.png', confidence=0.7, region=(75, 50, 2375, 850))
+        if game_icon:
+            pyautogui.click(*game_icon)
+
+    if iteration % 20 == 0:
+        # Level up check
         gift = pyautogui.locateCenterOnScreen('resources_3k/Gift.png', confidence=0.7, region=(800, 250, 1000, 750))
         if gift:
             pyautogui.click(*gift)
@@ -70,57 +125,27 @@ while True:
         # Collect money from task
         pyautogui.click(1250, 550)
 
-    # Check for open shop
-    heights_icon = pyautogui.locateOnScreen('resources_3k/SpringfieldHeights.png', confidence=0.6, grayscale=True,
-                                            region=(1400, 230, 220, 100))
-    if heights_icon:
-        if IS_SHOPPING_MODE:
-            shop_locator_data = {
-                'confidence': 0.6,
-                'grayscale': True,
-                'region': (1550, 350, 100, 70)
-            }
-
-            # Contains the names of all image names
-            heights_facilities = ['HeightsFurniture', 'HeightsCoffee', 'HeightsYoga', 'Pill', 'Trophy']
-
-            for facility in heights_facilities:
-                facility_icon = pyautogui.locateOnScreen(f'resources_3k/{facility}.png', **shop_locator_data)
-
-                if facility_icon:
-                    def find_start_task_button():
-                        return pyautogui.locateCenterOnScreen('resources_3k/StartTask.png', confidence=0.85,
-                                                              region=(1500, 410, 400, 540))
-
-
-                    button = find_start_task_button()
-                    while button:
-                        pyautogui.click(*button)
-                        button = find_start_task_button()
-                    break
-
-        # Close shop
-        close_sign = pyautogui.locateCenterOnScreen('resources_3k/CloseModal.png', confidence=0.6, region=(850, 300, 70, 70))
-        if close_sign:
-            pyautogui.click(*close_sign)
-            continue
-
     # Check for available task
     search_mark = pyautogui.locateCenterOnScreen('resources_3k/SearchMark.png', confidence=0.7, region=(75, 50, 175, 150))
     if search_mark:
         x, y = search_mark
         pyautogui.click(x, y)
 
-        if IS_SHOPPING_MODE:
-            # This skips 1 character, essentially allowing us to reach the shops on some occasions
-            for _ in range(SHOPPING_SKIPS):
-                pyautogui.click(x, y)
+        # if iteration % 10 == 0:
+        #     heights_icon = pyautogui.locateOnScreen('resources_3k/SpringfieldHeights.png', confidence=0.6, grayscale=True,
+        #                                             region=(1400, 230, 220, 100))
+        #     if heights_icon:
+        #         close_sign = pyautogui.locateCenterOnScreen('resources_3k/CloseModal.png', confidence=0.6,
+        #                                                     region=(850, 300, 70, 70))
+        #         if close_sign:
+        #             pyautogui.click(*close_sign)
+        #             continue
 
         bump_task = None
         event_task = None
-        for _ in range(3):
+        for _ in range(5):
             # Start "LookForToyRayGuns" task
-            event_task = pyautogui.locateOnScreen('resources_3k/LookForToyRayGuns.png', confidence=0.8, grayscale=True,
+            event_task = pyautogui.locateOnScreen('resources_3k/SpaceCrystals.png', confidence=0.8, grayscale=True,
                                                   region=(940, 400, 1000, 550))
             if event_task:
                 start_button = pyautogui.locateCenterOnScreen('resources_3k/StartTask.png', confidence=0.85,
@@ -130,6 +155,7 @@ while True:
                                                                       300,
                                                                       event_task.top + event_task.height))
                 pyautogui.click(*start_button)
+                task_started = True
                 break
 
             # Start "Bump Into a Sad Lonely Homer" task
@@ -143,7 +169,10 @@ while True:
                                                                       300,
                                                                       bump_task.height))
                 pyautogui.click(*start_button)
+                task_started = True
                 break
+        else:
+            task_started = False
     # Check if "Level" disappeared (assuming currently a mission's dialog is displayed)
     level = pyautogui.locateCenterOnScreen('resources_3k/UserLevel.png', confidence=0.85, grayscale=True,
                                            region=(200, 1220, 120, 40))
